@@ -1,0 +1,1391 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+
+/* ============================================================
+   [DEV 1] BASE RESET & LAYOUT
+ ============================================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Outfit', 'Segoe UI', Arial, sans-serif;
+    background: #05050a;
+    /* Deep, rich premium black */
+    color: #ffffff;
+    overflow: hidden;
+}
+
+/* ============================================================
+   [DEV 1] BACKGROUND LAYERS
+ ============================================================ */
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+
+#three-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 1;
+    /* Removed background radial glow to restore pure contrast and shine to the brain */
+    background: transparent;
+}
+
+#flashbang {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* ============================================================
+   [DEV 1] CONTAINER & PHASES STRUCTURE
+ ============================================================ */
+.container {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.phase {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    perspective: 1200px;
+    overflow: hidden;   /* prevent ANY child from escaping the viewport */
+}
+
+.phase.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ============================================================
+   [DEV 1] PREMIUM GLASSMORPHISM OVERLAYS
+ ============================================================ */
+.text-wrapper {
+    position: absolute;
+    min-width: 170px;
+    max-width: 195px;
+    z-index: 10;
+    opacity: 0;
+
+    /* Modern Glassmorphism implementation */
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.4) 0%, rgba(5, 5, 10, 0.6) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 8px 12px;
+    box-shadow:
+        0 15px 30px rgba(0, 0, 0, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 0 40px rgba(0, 255, 255, 0.02);
+
+    /* Smooth interaction transition (avoiding transform for GSAP compatibility) */
+    margin-top: 0;
+    transition: margin-top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.text-wrapper:hover {
+    margin-top: -8px;
+    box-shadow:
+        0 30px 60px rgba(0, 30, 60, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 0 50px rgba(0, 255, 255, 0.05);
+    border-color: rgba(0, 255, 255, 0.25);
+}
+
+.top-left {
+    top: 12vh;
+    left: 3vw;
+    text-align: left;
+}
+
+.top-right {
+    top: 12vh;
+    right: 3vw;
+    text-align: left;
+}
+
+/* ============================================================
+   [DEV 1] DYNAMIC TYPOGRAPHY
+ ============================================================ */
+.glowing-heading {
+    /* Gradient Text with vivid color stops */
+    background: linear-gradient(135deg, #00ffff 0%, #3a7bd5 50%, #8a2be2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    margin: 0 0 6px 0;
+
+    filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.4)) drop-shadow(0 0 20px rgba(0, 150, 255, 0.2));
+    animation: headPulse 3.5s infinite alternate ease-in-out;
+}
+
+@keyframes headPulse {
+    0% {
+        filter: drop-shadow(0 0 8px rgba(0, 200, 255, 0.4)) drop-shadow(0 0 20px rgba(0, 150, 255, 0.2));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 14px rgba(0, 255, 255, 0.6)) drop-shadow(0 0 35px rgba(0, 200, 255, 0.5));
+    }
+}
+
+.glowing-text {
+    color: #e6ffff;
+    font-size: 0.72em;
+    line-height: 1.35;
+    margin-bottom: 6px;
+    font-weight: 300;
+    position: relative;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.35);
+    transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Micro-interaction for hover on bullets */
+.glowing-text:hover {
+    color: #ffffff;
+    transform: translateX(6px);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.glowing-text strong {
+    color: #00ffff;
+    font-weight: 600;
+}
+
+/* Navigation Hint Pill UI */
+.nav-hint {
+    position: absolute;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.65em;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+
+    /* Pill Design */
+    background: rgba(10, 10, 20, 0.5);
+    padding: 8px 20px;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    animation: floatHint 3s infinite ease-in-out;
+}
+
+@keyframes floatHint {
+
+    0%,
+    100% {
+        transform: translate(-50%, 0);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    50% {
+        transform: translate(-50%, -6px);
+        box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
+        border-color: rgba(0, 255, 255, 0.3);
+    }
+}
+
+/* ============================================================
+   [PHASE 3] 3D BIOLOGICAL NEURON STYLES
+ ============================================================ */
+#phase3-3d-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Below text wrappers */
+}
+
+@keyframes swipeAnim {
+    0% { transform: translateX(-10px); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateX(10px); opacity: 0; }
+}
+
+/* ============================================================
+   [DEV 1] ANN & NEURAL NETWORK DIAGRAM STYLES
+ ============================================================ */
+.ann-diagram {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 30vw;
+    min-width: 400px;
+    justify-content: space-between;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.05));
+    animation: slowlyFloatArt 9s infinite ease-in-out reverse;
+}
+
+.ann-inputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+}
+
+.ann-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.ann-output {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.ann-node {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3em;
+    position: relative;
+    z-index: 5;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #ffffff;
+    cursor: default;
+}
+
+.ann-node:hover {
+    transform: scale(1.15) translateY(-2px);
+}
+
+.ann-node span {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.input-node {
+    width: 65px;
+    height: 65px;
+    background: radial-gradient(circle at 30% 30%, #4facfe 0%, #00f2fe 100%);
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.5), inset -5px -5px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    animation: softPulse 3s infinite alternate ease-in-out;
+}
+
+.center-node {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at 30% 30%, #f12711 0%, #f5af19 100%);
+    box-shadow: 0 0 35px rgba(245, 175, 25, 0.6), inset -6px -6px 15px rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    font-size: 1.6em;
+    animation: softPulse 3.5s infinite alternate ease-in-out;
+}
+
+.output-node {
+    width: 75px;
+    height: 75px;
+    background: radial-gradient(circle at 30% 30%, #11998e 0%, #38ef7d 100%);
+    box-shadow: 0 0 30px rgba(56, 239, 125, 0.6), inset -5px -5px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    animation: softPulse 4s infinite alternate ease-in-out;
+}
+
+@keyframes softPulse {
+    0% {
+        filter: brightness(1) saturate(1);
+        box-shadow: 0 0 20px currentColor;
+    }
+
+    100% {
+        filter: brightness(1.2) saturate(1.2);
+        box-shadow: 0 0 40px currentColor;
+    }
+}
+
+.ann-lines {
+    position: absolute;
+    top: 50%;
+    left: 45px;
+    width: calc(100% - 90px);
+    height: 200px;
+    transform: translateY(-50%);
+    z-index: 1;
+    pointer-events: none;
+    /* Add SVG path styles if they happen to be drawn inside. Since it's <svg class="ann-lines"> we can style its inner lines just in case. */
+}
+
+.ann-lines path,
+.ann-lines line {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke 0.3s;
+}
+
+/* Neural Network Phase 4 */
+.nn-diagram {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.1));
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================================
+   [PHASE 2] HOLOGRAM & BLACK HOLE TRANSITION
+ ============================================================ */
+#hologram-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* Between Brain (-1) and UI (1) */
+    pointer-events: none;
+    /* Disabled manual dragging */
+    opacity: 0;
+    display: none;
+}
+
+#vignette-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.95) 85%);
+    z-index: 9997;
+    pointer-events: none;
+    opacity: 0;
+}
+
+#white-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* ============================================================
+   [PHASE 4] ARTIFICIAL NEURON — neuron-canvas
+   Sits at z-index 0: above stars (-2) but below UI (1).
+   alpha:true renderer makes star field visible through canvas.
+ ============================================================ */
+#neuron-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* behind UI (1+), above stars (-2) */
+    display: none;
+    /* y.js flips to 'block' on phase 4 entry */
+    pointer-events: none;
+    mix-blend-mode: screen;
+    /* black = transparent → stars show through */
+}
+
+/* ============================================================
+   [PHASE 4] INFO BOXES — glassmorphism cards at bottom
+ ============================================================ */
+.info-boxes-container {
+    position: absolute;
+    bottom: 1vh;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1.2vw;
+    z-index: 10;
+    padding: 0 1.5vw;
+    pointer-events: auto;
+}
+
+.info-box {
+    z-index: 10;
+    background: linear-gradient(135deg, rgba(10, 15, 25, 0.88) 0%, rgba(5, 5, 10, 0.96) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-top: 1px solid rgba(0, 255, 255, 0.3);
+    border-left: 1px solid rgba(0, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    max-width: 24vw;
+    max-height: 130px;         /* cap so it doesn't grow endlessly */
+    flex: 1;
+    overflow-y: auto;           /* scroll if content exceeds cap */
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,255,0.3) transparent;
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.5),
+        inset 0 0 30px rgba(0, 255, 255, 0.02);
+    transition: transform 0.3s ease, box-shadow 0.4s ease;
+}
+.info-box::-webkit-scrollbar { width: 3px; }
+.info-box::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 2px; }
+
+.info-box:hover {
+    transform: translateY(-8px) !important;
+    box-shadow:
+        0 30px 60px rgba(0, 30, 60, 0.4),
+        inset 0 0 50px rgba(0, 255, 255, 0.05);
+}
+
+/* Override glowing-heading size inside info boxes */
+.ann-heading {
+    font-size: 0.82em !important;
+    margin-bottom: 4px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================
+   [PHASE 4] EQUATION BOX
+ ============================================================ */
+.equation-box {
+    position: absolute;
+    top: 2.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 7px 16px;
+    z-index: 10;
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.7) 0%, rgba(5, 5, 10, 0.9) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.equation-box::before,
+.equation-box::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+}
+
+.equation-box::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1.5px solid rgba(0, 217, 255, 0.65);
+    border-left: 1.5px solid rgba(0, 217, 255, 0.65);
+}
+
+.equation-box::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1.5px solid rgba(0, 217, 255, 0.65);
+    border-right: 1.5px solid rgba(0, 217, 255, 0.65);
+}
+
+#equation-text {
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-align: center;
+    color: rgba(220, 230, 255, 0.95);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    line-height: 1.6;
+}
+
+#equation-text strong {
+    color: #00ffff;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 15px #00ffff;
+}
+
+/* ============================================================
+   [PHASE 4] NODE LABELS (HUD projections)
+ ============================================================ */
+.node-label {
+    position: absolute;
+    z-index: 9;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    border-left: 2px solid rgba(0, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.node-label.active {
+    opacity: 1;
+    border-left-color: #00ffff;
+}
+
+.node-label .var {
+    color: #00ffff;
+    font-weight: bold;
+}
+
+.node-label .val {
+    color: rgba(220, 230, 255, 0.9);
+}
+
+.output-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    background: none;
+}
+
+.output-label.active-out {
+    color: #00ffff;
+    text-shadow: 0 0 12px #00ffff, 0 0 24px rgba(0, 255, 255, 0.4);
+    opacity: 1;
+    animation: labelFlash 1.8s ease-in-out infinite;
+}
+
+.output-label.inactive-out {
+    color: #9D00FF;
+    text-shadow: 0 0 8px #9D00FF;
+    opacity: 0.4;
+}
+
+@keyframes labelFlash {
+
+    0%,
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 12px #00ffff, 0 0 24px rgba(0, 255, 255, 0.4);
+    }
+
+    50% {
+        opacity: 0.65;
+        text-shadow: 0 0 6px #00ffff;
+    }
+}
+
+/* ============================================================
+   [PHASE 4] FLYING SIGNAL TAGS
+ ============================================================ */
+.signal-tag {
+    position: absolute;
+    z-index: 15;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: #00ffff;
+    background: rgba(0, 20, 30, 0.88);
+    border: 1px solid rgba(0, 255, 255, 0.45);
+    border-radius: 5px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2), inset 0 0 6px rgba(0, 255, 255, 0.04);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+}
+
+.signal-tag.purple-tag {
+    color: #c77dff;
+    border-color: rgba(199, 125, 255, 0.45);
+    text-shadow: 0 0 8px rgba(157, 0, 255, 0.7);
+    box-shadow: 0 0 10px rgba(157, 0, 255, 0.2), inset 0 0 6px rgba(157, 0, 255, 0.04);
+    background: rgba(15, 0, 25, 0.88);
+}
+
+/* ============================================================
+   [PHASE 4] GLITCH EFFECT on info-box headings
+ ============================================================ */
+.glitch-active {
+    position: relative;
+    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.glitch-active::before,
+.glitch-active::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-active::before {
+    left: 3px;
+    text-shadow: -2px 0 #00ffff;
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim 0.2s linear infinite alternate-reverse;
+    background: rgba(15, 15, 25, 0.9);
+}
+
+.glitch-active::after {
+    left: -3px;
+    text-shadow: -2px 0 #9D00FF;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim2 0.2s linear infinite alternate-reverse;
+    background: rgba(15, 15, 25, 0.9);
+}
+
+@keyframes glitch-anim {
+    0% {
+        clip: rect(10px, 9999px, 31px, 0);
+    }
+
+    100% {
+        clip: rect(65px, 9999px, 98px, 0);
+    }
+}
+
+@keyframes glitch-anim2 {
+    0% {
+        clip: rect(85px, 9999px, 12px, 0);
+    }
+
+    100% {
+        clip: rect(21px, 9999px, 89px, 0);
+    }
+}
+
+@keyframes glitch-skew {
+
+    0%,
+    100% {
+        transform: skew(0deg);
+    }
+
+    20% {
+        transform: skew(-10deg);
+    }
+
+    40% {
+        transform: skew(10deg);
+    }
+}
+
+/* ============================================================
+   [PHASE 4] NAV HINT override for ANN phase (bottom-right)
+ ============================================================ */
+.ann-nav {
+    bottom: 3vh;
+    right: 3vw;
+    left: auto;
+    transform: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1.8px;
+    color: rgba(0, 217, 255, 0.3);
+    border-top: 1px solid rgba(0, 217, 255, 0.1);
+    padding-top: 5px;
+    background: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    border-radius: 0;
+    animation: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+/* ============================================================
+   [PHASE 5] TOKENIZATION & EMBEDDING
+ ============================================================ */
+#token-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    display: none;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+#phase-tokenization .info-box,
+#phase-embedding .info-box {
+    padding: 8px 12px;
+}
+#phase-tokenization .glowing-text,
+#phase-embedding .glowing-text {
+    font-size: 0.72rem;
+    margin: 3px 0;
+}
+#phase-tokenization .ann-heading,
+#phase-embedding .ann-heading {
+    font-size: 0.8rem !important;
+}
+
+.token-ui-container {
+    position: absolute;
+    top: 15vh;
+    width: 95%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5vh;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.sentence-box {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    min-height: 1.5rem;
+}
+
+.sentence-box .word {
+    display: inline-block;
+    margin: 0 3px;
+    opacity: 0;
+}
+
+.tokens-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+}
+
+.token-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.token-pill {
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.6) 0%, rgba(5, 5, 10, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.15), inset 0 0 10px rgba(0, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    white-space: pre;
+}
+
+.token-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: #9D00FF;
+    text-shadow: 0 0 10px rgba(157, 0, 255, 0.6);
+    opacity: 0;
+    transform: rotateX(90deg);
+}
+
+.vector-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 1vh;
+    opacity: 0;
+}
+
+.vector-bracket {
+    font-size: 1.8rem;
+    font-weight: 100;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#vector-elements {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+.vector-element {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: #fff;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+    background: rgba(157, 0, 255, 0.15);
+    border: 1px solid rgba(157, 0, 255, 0.4);
+    border-radius: 4px;
+    padding: 3px 6px;
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* ============================================================
+   [PHASE 5 / 6] TERMINAL LOG (narrator-box)
+ ============================================================ */
+.narrator-box {
+    width: 100%;
+    padding: 8px 14px;
+    background: rgba(0, 8, 15, 0.75);
+    border: 1px solid rgba(0, 255, 255, 0.22);
+    border-radius: 7px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    box-shadow: 0 0 18px rgba(0, 255, 255, 0.07), inset 0 0 12px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+    height: 84px;
+    overflow-y: auto;
+    overflow-x: hidden;          /* log lines must NOT overflow horizontally */
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,255,0.2) transparent;
+    pointer-events: auto;        /* Fix scrolling */
+}
+.narrator-box::-webkit-scrollbar { width: 4px; }
+.narrator-box::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.2); border-radius: 2px; }
+
+/* Individual log lines — MUST wrap, never push the box wider */
+.log-line {
+    color: rgba(180, 220, 255, 0.85);
+    padding: 1px 0;
+    line-height: 1.55;
+    word-break: break-word;      /* prevents long lines overflowing */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.log-line.log-success  { color: #39ff6a; text-shadow: 0 0 6px rgba(57,255,106,0.5); }
+.log-line.log-waiting  { color: #ffd166; text-shadow: 0 0 6px rgba(255,209,102,0.5); animation: pulse-log 2s ease-in-out infinite; }
+.log-line.log-default  { color: rgba(0, 220, 255, 0.82); }
+
+@keyframes pulse-log {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+}
+
+/* Blinking cursor after last log line (via pseudo on the container) */
+.narrator-box::after {
+    content: '_';
+    color: rgba(0, 255, 255, 0.5);
+    animation: blink-cursor 1s step-end infinite;
+    display: inline-block;
+    margin-left: 2px;
+    font-size: 0.75rem;
+}
+
+@keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* ============================================================
+   [PHASE 5] USER PROMPT AREA (Dynamic BPE)
+ ============================================================ */
+.user-prompt-container {
+    position: absolute;
+    top: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+    pointer-events: auto;
+    background: rgba(10, 10, 20, 0.65);
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.05);
+    opacity: 0;
+}
+
+.user-prompt-container input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    width: 260px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.user-prompt-container input:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.25), inset 0 2px 5px rgba(0,0,0,0.5);
+    background: rgba(10, 20, 30, 0.5);
+}
+
+.user-prompt-container input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.user-prompt-container button {
+    background: linear-gradient(135deg, #00ffff 0%, #3a7bd5 100%);
+    color: #05050a;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+}
+
+.user-prompt-container button:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+}
+
+.user-prompt-container button:active {
+    transform: translateY(1px);
+}
+
+/* ============================================================
+   [PHASE 6] EMBEDDING MATRIX LOOKUP
+ ============================================================ */
+.embed-ui-container {
+    position: absolute;
+    top: 11vh;
+    bottom: 16vh;
+    width: 92%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8vh;
+    z-index: 5;
+    pointer-events: none;
+    /* NO overflow:hidden — that kills child scrollbars */
+}
+
+/* Phase 6 narrator gets more height to show all 7 explanation lines */
+#phase-embedding .narrator-box {
+    height: 120px;
+    flex-shrink: 0;
+}
+
+
+/* Clickable token ID chip row — scrollable horizontally */
+.embed-id-row {
+    display: flex;
+    flex-wrap: nowrap;          /* single row → enables horizontal scroll */
+    justify-content: flex-start;
+    gap: 8px;
+    pointer-events: auto;
+    width: 100%;
+    overflow-x: auto;           /* horizontal scroll on the numbers row */
+    overflow-y: hidden;
+    padding: 4px 2px 8px;       /* bottom pad leaves room for scrollbar */
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,255,0.35) transparent;
+}
+.embed-id-row::-webkit-scrollbar { height: 5px; }
+.embed-id-row::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.35); border-radius: 3px; }
+.embed-id-row::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.7); }
+
+.embed-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.88rem;
+    color: #00ffff;
+    background: linear-gradient(135deg, rgba(0,20,40,0.7) 0%, rgba(0,5,15,0.9) 100%);
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color 0.25s, color 0.25s;
+    pointer-events: auto;
+    box-shadow: 0 0 10px rgba(0,255,255,0.08);
+    transform: translateY(12px);
+    opacity: 0;
+}
+.embed-chip:hover {
+    border-color: #00ffff;
+    color: #fff;
+    box-shadow: 0 0 18px rgba(0,255,255,0.3);
+}
+.embed-chip.active-chip {
+    border-color: #00ffff;
+    color: #fff;
+    background: rgba(0, 60, 80, 0.7);
+}
+
+/* Scrollable embedding matrix — cyberpunk glassmorphism */
+.embed-matrix-container {
+    width: 100%;
+    min-width: 0;               /* KEY: prevents flex child ignoring parent width */
+    align-self: stretch;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid rgba(157, 0, 255, 0.4);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 30px rgba(157, 0, 255, 0.1);
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,255,0.5) rgba(0,0,0,0.3);
+    pointer-events: auto;        /* Fix scrolling */
+}
+.embed-matrix-container::-webkit-scrollbar { width: 8px; height: 8px; }
+.embed-matrix-container::-webkit-scrollbar-corner { background: rgba(0,0,0,0.4); }
+.embed-matrix-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+.embed-matrix-container::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.5); border-radius: 4px; }
+.embed-matrix-container::-webkit-scrollbar-thumb:hover { background: rgba(157,0,255,0.9); }
+
+.embed-matrix-grid {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 8px;
+    gap: 1px;
+    width: max-content;        /* grows to fit all cells — forces horiz scroll on container */
+    min-width: 100%;
+}
+
+.matrix-row {
+    display: flex;
+    flex-wrap: nowrap;           /* never wrap — user scrolls horizontally */
+    white-space: nowrap;
+    gap: 4px;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: background 0.3s, box-shadow 0.3s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+}
+.matrix-row-label {
+    color: rgba(157,0,255,0.6);
+    min-width: 80px;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+}
+.matrix-cell {
+    color: rgba(0, 200, 230, 0.7);   /* dim cyan — overridden per-cell in JS */
+    letter-spacing: 0.3px;
+    font-size: 0.72rem;
+    margin: 0 3px;
+}
+.matrix-row.highlighted {
+    background: rgba(0, 255, 255, 0.07);
+    box-shadow: 0 0 18px rgba(0,255,255,0.18);
+}
+.matrix-row.highlighted .matrix-cell {
+    color: rgba(0, 255, 255, 0.9);
+    text-shadow: 0 0 8px rgba(0,255,255,0.5);
+}
+.matrix-row.highlighted .matrix-row-label {
+    color: #9D00FF;
+    text-shadow: 0 0 8px rgba(157,0,255,0.7);
+}
+
+/* Extracted float vector output — horizontal scrolling strip */
+.embed-output-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;          /* single row */
+    overflow-x: auto;           /* scroll to see all floats */
+    overflow-y: hidden;
+    pointer-events: auto;
+    padding: 4px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(157,0,255,0.5) transparent;
+    flex-shrink: 0;             /* don't shrink within the column */
+}
+.embed-output-container::-webkit-scrollbar { height: 5px; }
+.embed-output-container::-webkit-scrollbar-thumb { background: rgba(157,0,255,0.5); border-radius: 3px; }
+.embed-output-container::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.8); }
+
+.vector-bracket {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.6rem;
+    color: rgba(0,255,255,0.4);
+    flex-shrink: 0;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.embed-output-floats {
+    display: flex;
+    flex-wrap: nowrap;          /* single scrolling row */
+    gap: 5px;
+    align-items: center;
+}
+
+.embed-float-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.9);
+    background: rgba(157, 0, 255, 0.08);
+    border: 1px solid rgba(157, 0, 255, 0.25);
+    border-radius: 4px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-shadow: 0 0 10px rgba(157,0,255,0.5);
+}
+
+
+/* Send to Neuron button */
+.send-to-neuron-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #05050a;
+    background: linear-gradient(135deg, #00ffff 0%, #9D00FF 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 34px;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 24px rgba(0,255,255,0.35), 0 4px 24px rgba(157,0,255,0.2);
+    transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), box-shadow 0.3s;
+    margin-top: 6px;
+}
+.send-to-neuron-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 10px 40px rgba(0,255,255,0.5), 0 6px 30px rgba(157,0,255,0.35);
+}
+.send-to-neuron-btn:active {
+    transform: translateY(1px);
+}
+
+/* ============================================================
+   TRANSITION OVERLAYS
+ ============================================================ */
+#sun-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, #fff 0%, #00ffff 30%, transparent 70%);
+    border-radius: 50%;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    filter: blur(20px);
+}
+
+#celestial-stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #051a3a 0%, #000000 100%);
+    z-index: -3;
+    transition: opacity 1.5s ease;
+}
+
+/* ============================================================
+   [PHASE 7] ANN SEMANTIC HUB — PERFECT RESTORATION
+ ============================================================ */
+#phase-semantic-hub {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    background: transparent;
+    z-index: 1;
+}
+
+#phase-semantic-hub.active {
+    display: block !important;
+}
+
+#phase-semantic-hub .hub-panel {
+    position: fixed !important;
+    background: linear-gradient(135deg, rgba(5, 10, 20, 0.85) 0%, rgba(2, 4, 10, 0.95) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    z-index: 10010 !important;
+    pointer-events: auto !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+#phase-semantic-hub .hub-top-left { top: 48px !important; left: 24px !important; width: 240px !important; }
+#phase-semantic-hub .hub-top-center { top: 48px !important; left: 50% !important; transform: translateX(-50%) !important; width: 400px !important; }
+#phase-semantic-hub .hub-bottom-left { bottom: 24px !important; left: 24px !important; width: 280px !important; }
+#phase-semantic-hub .hub-bottom-right { bottom: 24px !important; right: 24px !important; width: 280px !important; }
+#phase-semantic-hub .hub-left-center { top: 50% !important; left: 24px !important; transform: translateY(-50%) !important; width: 200px !important; }
+
+#phase-semantic-hub .hub-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 8px 12px;
+    margin-top: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+#phase-semantic-hub .hub-btn-predict { background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.4); color: #00ff88;}
+#phase-semantic-hub .hub-btn-predict:hover { background: rgba(0, 255, 136, 0.25); box-shadow: 0 0 15px rgba(0,255,136,0.3); transform: translateY(-1px); }
+#phase-semantic-hub .hub-btn-backprop { background: rgba(255, 51, 68, 0.1); border-color: rgba(255, 51, 68, 0.4); color: #ff3344;}
+#phase-semantic-hub .hub-btn-backprop:hover { background: rgba(255, 51, 68, 0.25); box-shadow: 0 0 15px rgba(255,51,68,0.3); transform: translateY(-1px); }
+
+#phase-semantic-hub input[type="text"] {
+    width: 100%;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 2px solid #00d4ff;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.hub-predicted-token {
+    font-size: 1.5rem;
+    color: #b44fff;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Outfit', sans-serif;
+    text-shadow: 0 0 15px rgba(180, 79, 255, 0.4);
+}
+
+.hub-node-label {
+    position: fixed !important;
+    background: rgba(0,0,0,0.85) !important;
+    border: 1px solid rgba(255,255,255,0.6) !important;
+    color: white !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    font-size: 0.62rem !important;
+    font-family: 'Space Mono', monospace !important;
+    pointer-events: none !important;
+    transform: translate(-50%, -50%) !important;
+    opacity: 0;
+    z-index: 10050 !important;
+}
+
+.hub-layer-title {
+    position: fixed !important;
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 0.65rem !important;
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: 1px !important;
+    text-align: center !important;
+    pointer-events: none !important;
+    transform: translate(-50%, -100%) !important;
+    white-space: pre !important;
+    text-transform: uppercase !important;
+    z-index: 10050 !important;
+}
+
+.hub-math-content {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: #e6ffff;
+    line-height: 1.4;
+}
+
+/* Speed Slider Styling */
+#hub-speed-slider {
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+}
+#hub-speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #00ffff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    transition: all 0.2s;
+}
+#hub-speed-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: #fff;
+}
+
+.hub-hidden { display: none !important; }
